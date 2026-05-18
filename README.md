@@ -100,7 +100,7 @@ https://oapi.dingtalk.com/robot/send?access_token=你的token
 ### 1. 克隆代码
 
 ```bash
-git clone https://github.com/your-username/GLUT-Schedule.git
+git clone https://github.com/NullSetx/GLUT-Schedule.git
 cd GLUT-Schedule
 ```
 
