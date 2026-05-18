@@ -22,11 +22,27 @@ if command -v apt &> /dev/null; then
     apt update
     apt install -y python3 python3-pip python3-venv
 elif command -v yum &> /dev/null; then
-    yum install -y python3 python3-pip
+    yum install -y python38 python38-pip
 elif command -v dnf &> /dev/null; then
-    dnf install -y python3 python3-pip
+    dnf install -y python38 python38-pip
 else
-    echo "未找到包管理器，请手动安装 Python3"
+    echo "未找到包管理器，请手动安装 Python3.8+"
+    exit 1
+fi
+
+# 检查 Python 版本
+PYTHON_CMD="python3"
+if command -v python3.8 &> /dev/null; then
+    PYTHON_CMD="python3.8"
+fi
+
+PYTHON_VERSION=$($PYTHON_CMD -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+echo "Python 版本: $PYTHON_VERSION"
+
+if [ $(echo "$PYTHON_VERSION < 3.8" | bc) -eq 1 ]; then
+    echo "错误: 需要 Python 3.8+，当前版本 $PYTHON_VERSION 太老"
+    echo "请手动安装 Python 3.8+:"
+    echo "  yum install -y python38 python38-pip"
     exit 1
 fi
 
@@ -44,7 +60,7 @@ fi
 # 4. 创建虚拟环境
 if [ ! -d ".venv" ]; then
     echo "创建虚拟环境..."
-    python3 -m venv .venv
+    $PYTHON_CMD -m venv .venv
 fi
 
 # 5. 安装 Python 依赖
