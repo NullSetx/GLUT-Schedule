@@ -7,13 +7,16 @@
 - 查询教务系统课表
 - 支持命令行参数和配置文件
 - 钉钉机器人消息推送
-- 定时自动推送 (cron)
+- 定时自动推送
+- 交互式机器人 (需企业内部应用)
 
 ## 文件说明
 
 | 文件 | 说明 |
 |------|------|
 | `main.py` | 主入口脚本 |
+| `app.py` | 交互式机器人 (Stream 模式) |
+| `scheduler.py` | 定时推送服务 |
 | `config.yaml` | 配置文件 (需自行创建) |
 | `config.example.yaml` | 配置文件模板 |
 | `deploy.sh` | Linux 部署脚本 |
@@ -49,6 +52,13 @@ dingtalk:
   access_token: "你的钉钉机器人token"
   secret: "你的钉钉机器人密钥"
   message_type: "markdown"
+
+schedule:
+  enabled: true
+  push_times:
+    - "07:30"
+    - "21:00"
+  push_type: "today"
 ```
 
 ### 3. 运行
@@ -62,6 +72,9 @@ python3 main.py --data 2026-5-20
 
 # 查询并发送到钉钉
 python3 main.py --send
+
+# 启动定时推送服务
+python3 scheduler.py
 ```
 
 ## 命令行参数
@@ -152,4 +165,62 @@ tail -f logs/$(date +%Y-%m-%d).log
 - Python 3.6+
 - requests
 - pyyaml
+- dingtalk-stream
+- schedule
+
+---
+
+## 交互式钉钉机器人
+
+在钉钉群里 @机器人 发送消息即可查询课表。
+
+### 前置条件
+
+- 钉钉企业管理员权限
+- 企业内部应用
+
+### 配置步骤
+
+#### 1. 创建企业内部应用
+
+1. 登录 https://open-dev.dingtalk.com/
+2. 进入 应用开发 → 企业内部应用 → 创建应用
+3. 添加机器人能力
+4. 记录 AppKey 和 AppSecret
+
+#### 2. 更新配置文件
+
+在 `config.yaml` 中配置机器人信息：
+
+```yaml
+edu:
+  username: "你的学号"
+  password: "你的密码"
+  base_url: "http://jw.glut.edu.cn"
+
+dingtalk:
+  app_key: "你的AppKey"
+  app_secret: "你的AppSecret"
+```
+
+#### 3. 启动服务
+
+```bash
+python3 app.py
+```
+
+### 使用方式
+
+1. 将机器人添加到钉钉群聊
+2. 在群聊中 @机器人 发送消息:
+
+```
+@课表机器人 查询2026-5-19的课表
+```
+
+支持的日期格式:
+- `查询2026-5-19的课表`
+- `课表5-19`
+- `5-19`
+- `明天，后天，今天有什么课`
 

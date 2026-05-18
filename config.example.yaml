@@ -4,8 +4,11 @@ edu:
   password: "your_password_here"
   base_url: "http://jw.glut.edu.cn"
 
-# 钉钉机器人配置
+# 钉钉机器人配置 (Stream 模式需要 app_key 和 app_secret)
 dingtalk:
+  app_key: "your_app_key_here"
+  app_secret: "your_app_secret_here"
+  # 以下配置用于 Webhook 模式 (定时推送)
   access_token: "your_access_token_here"
   secret: "your_secret_here"
   # 消息类型: "text" 或 "markdown"
@@ -15,3 +18,13 @@ dingtalk:
 defaults:
   date: null          # null 表示当天，也可写 "2026-5-18"
   send_to_dingtalk: false
+
+# 定时推送配置
+schedule:
+  enabled: false
+  # 推送时间 (24小时制)
+  push_times:
+    - "07:30"    # 早上推送当天课表
+    - "21:00"    # 晚上推送明天课表
+  # 推送日期类型: "today" 今天, "tomorrow" 明天
+  push_type: "today"
