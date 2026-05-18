@@ -110,51 +110,52 @@ https://oapi.dingtalk.com/robot/send?access_token=你的token
 
 ## Linux 部署
 
-### 方式一：一键部署
+### 环境要求
+
+- Python 3.9+
+- 推荐使用 [uv](https://github.com/astral-sh/uv) 管理 Python 环境和依赖
+
+### 部署步骤
+
+#### 1. 安装 uv (可选，推荐)
 
 ```bash
-# 1. 克隆代码
-git clone https://github.com/NullSetx/GLUT-Schedule.git
-cd GLUT-Schedule
-
-# 2. 创建并编辑配置文件
-cp config.example.yaml config.yaml
-# 编辑 config.yaml 填入你的配置
-
-# 3. 一键部署 (需要 root 权限)
-sudo ./deploy-bot.sh
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-### 方式二：手动部署
-
-#### 1. 克隆代码
+#### 2. 克隆代码
 
 ```bash
 git clone https://github.com/NullSetx/GLUT-Schedule.git
 cd GLUT-Schedule
 ```
 
-#### 2. 安装依赖
+#### 3. 创建虚拟环境并安装依赖
 
 ```bash
+# 使用 uv
+uv venv --python 3.11
+uv pip install -r requirements.txt
+
+# 或使用 venv + pip
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 ```
 
-#### 3. 配置
+#### 4. 配置
 
 ```bash
 cp config.example.yaml config.yaml
 # 编辑 config.yaml 填入你的配置
 ```
 
-#### 4. 测试运行
+#### 5. 测试运行
 
 ```bash
 .venv/bin/python app.py
 ```
 
-#### 5. 配置 systemd 服务 (开机自启动)
+#### 6. 配置 systemd 服务 (开机自启动)
 
 ```bash
 # 复制服务文件
@@ -186,7 +187,7 @@ sudo journalctl -u GLUT-Schedule -f
 
 ## 依赖
 
-- Python 3.6+
+- Python 3.9+
 - requests
 - pyyaml
 - dingtalk-stream
