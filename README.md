@@ -110,54 +110,78 @@ https://oapi.dingtalk.com/robot/send?access_token=你的token
 
 ## Linux 部署
 
-### 1. 克隆代码
+### 方式一：一键部署
+
+```bash
+# 1. 克隆代码
+git clone https://github.com/NullSetx/GLUT-Schedule.git
+cd GLUT-Schedule
+
+# 2. 创建并编辑配置文件
+cp config.example.yaml config.yaml
+# 编辑 config.yaml 填入你的配置
+
+# 3. 一键部署 (需要 root 权限)
+sudo ./deploy-bot.sh
+```
+
+### 方式二：手动部署
+
+#### 1. 克隆代码
 
 ```bash
 git clone https://github.com/NullSetx/GLUT-Schedule.git
 cd GLUT-Schedule
 ```
 
-### 2. 安装依赖
+#### 2. 安装依赖
 
 ```bash
-pip3 install -r requirements.txt
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
 ```
 
-### 3. 配置
+#### 3. 配置
 
 ```bash
 cp config.example.yaml config.yaml
 # 编辑 config.yaml 填入你的配置
 ```
 
-### 3. 测试运行
+#### 4. 测试运行
 
 ```bash
-python3 main.py --send
+.venv/bin/python app.py
 ```
 
-### 4. 配置定时任务
+#### 5. 配置 systemd 服务 (开机自启动)
 
 ```bash
-crontab -e
+# 复制服务文件
+sudo cp GLUT-Schedule.service /etc/systemd/system/
+
+# 重新加载 systemd
+sudo systemctl daemon-reload
+
+# 启动服务
+sudo systemctl enable GLUT-Schedule
+sudo systemctl start GLUT-Schedule
 ```
 
-添加定时任务 (工作日每天早上 7:30 推送，路径改为你的实际路径)：
-
-```
-30 7 * * 1-5 /path/to/GLUT-Schedule/deploy.sh >> /path/to/GLUT-Schedule/logs/cron.log 2>&1
-```
-
-| cron 表达式 | 说明 |
-|------------|------|
-| `30 7 * * 1-5` | 每周一到周五 7:30 |
-| `30 7 * * *` | 每天 7:30 |
-| `0 9 * * 1` | 每周一 9:00 |
-
-### 5. 查看日志
+### 服务管理
 
 ```bash
-tail -f logs/$(date +%Y-%m-%d).log
+# 查看状态
+sudo systemctl status GLUT-Schedule
+
+# 重启服务
+sudo systemctl restart GLUT-Schedule
+
+# 停止服务
+sudo systemctl stop GLUT-Schedule
+
+# 查看日志
+sudo journalctl -u GLUT-Schedule -f
 ```
 
 ## 依赖
