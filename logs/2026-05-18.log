@@ -1,0 +1,31 @@
+[2026-05-18 08:07:45] 开始执行课表推送任务
+[2026-05-18 08:07:45] 使用虚拟环境: /Users/pxj/projects/My_Spyder/GLUT/Schedule/.venv/bin/python
+[2026-05-18 08:07:52] 依赖已安装
+[2026-05-18 08:07:52] 执行命令: /Users/pxj/projects/My_Spyder/GLUT/Schedule/.venv/bin/python /Users/pxj/projects/My_Spyder/GLUT/Schedule/main.py --send
+/Users/pxj/projects/My_Spyder/GLUT/Schedule/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+正在登录教务系统...
+正在查询 2026-05-18 的课表...
+
+==================================================
+2026-05-18 课表
+
+1. 第1、2节 | 08:20:00 - 10:00:00
+   自然语言处理
+   雁山6号楼 06602D
+
+2. 第5、6节 | 14:30:00 - 16:10:00
+   形势与政策4
+   雁山5号楼 05310D
+
+3. 第7、8节 | 16:20:00 - 18:00:00
+   计算机组成原理B
+   雁山2号楼 02424S
+
+4. 第9、10节 | 18:30:00 - 20:10:00
+   计算机组成原理B
+   雁山2号楼 02424S
+==================================================
+
+钉钉消息发送成功
+[2026-05-18 08:07:53] 任务执行成功

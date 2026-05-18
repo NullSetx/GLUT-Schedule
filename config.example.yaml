@@ -1,0 +1,17 @@
+# 教务系统配置
+edu:
+  username: "your_username_here"
+  password: "your_password_here"
+  base_url: "http://jw.glut.edu.cn"
+
+# 钉钉机器人配置
+dingtalk:
+  access_token: "your_access_token_here"
+  secret: "your_secret_here"
+  # 消息类型: "text" 或 "markdown"
+  message_type: "markdown"
+
+# 查询默认配置
+defaults:
+  date: null          # null 表示当天，也可写 "2026-5-18"
+  send_to_dingtalk: false

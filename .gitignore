@@ -1,0 +1,7 @@
+.venv/
+.logs/
+schedule.py
+sc_agent.py
+config.yaml
+__pycache__/
+*.pyc
