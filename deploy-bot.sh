@@ -18,8 +18,17 @@ fi
 
 # 2. 安装依赖
 echo "安装系统依赖..."
-apt update
-apt install -y python3 python3-pip python3-venv
+if command -v apt &> /dev/null; then
+    apt update
+    apt install -y python3 python3-pip python3-venv
+elif command -v yum &> /dev/null; then
+    yum install -y python3 python3-pip
+elif command -v dnf &> /dev/null; then
+    dnf install -y python3 python3-pip
+else
+    echo "未找到包管理器，请手动安装 Python3"
+    exit 1
+fi
 
 # 3. 克隆或更新代码
 if [ -d "$INSTALL_DIR" ]; then
