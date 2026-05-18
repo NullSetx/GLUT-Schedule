@@ -153,6 +153,3 @@ tail -f logs/$(date +%Y-%m-%d).log
 - requests
 - pyyaml
 
-## 安全提示
-
-`config.yaml` 包含敏感信息，请勿提交到 Git。已在 `.gitignore` 中排除。
