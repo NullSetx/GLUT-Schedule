@@ -49,8 +49,11 @@ edu:
   base_url: "http://jw.glut.edu.cn"
 
 dingtalk:
-  access_token: "你的钉钉机器人token"
-  secret: "你的钉钉机器人密钥"
+  app_key: "你的AppKey"
+  app_secret: "你的AppSecret"
+  # 群聊 ID，定时推送和手动发送时需要
+  # 获取方式: 在钉钉群聊中 @机器人 发送任意消息，查看服务器日志中的 openConversationId
+  chat_id: "你的群聊ID"
   message_type: "markdown"
 
 schedule:
@@ -90,23 +93,26 @@ python3 scheduler.py
 
 ## 钉钉机器人配置
 
-### 1. 创建机器人
+### 1. 创建企业内部应用
 
-1. 打开钉钉群聊
-2. 点击群设置 → 智能群助手 → 添加机器人
-3. 选择"自定义 (通过 Webhook 接入)"
-4. 安全设置选择"加签"
-5. 复制 Webhook URL 和密钥
+1. 登录 https://open-dev.dingtalk.com/
+2. 进入 应用开发 → 企业内部应用 → 创建应用
+3. 添加机器人能力
+4. 记录 AppKey 和 AppSecret
 
 ### 2. 配置机器人
 
-从 Webhook URL 中提取 `access_token`：
+将 `app_key` 和 `app_secret` 填入 `config.yaml`。
 
-```
-https://oapi.dingtalk.com/robot/send?access_token=你的token
-```
+### 3. 获取群聊 ID (chat_id)
 
-将 `access_token` 和 `secret` 填入 `config.yaml`。
+1. 将机器人添加到钉钉群聊
+2. 在群聊中 @机器人 发送任意消息
+3. 查看服务器日志中的 `openConversationId`:
+   ```bash
+   journalctl -u GLUT-Schedule -f
+   ```
+4. 将获取到的 ID 填入 `config.yaml` 的 `chat_id` 字段
 
 ## Linux 部署
 
@@ -210,33 +216,9 @@ sudo journalctl -u GLUT-Schedule-Scheduler -f
 ### 前置条件
 
 - 钉钉企业管理员权限
-- 企业内部应用
+- 企业内部应用 (见上方配置步骤)
 
-### 配置步骤
-
-#### 1. 创建企业内部应用
-
-1. 登录 https://open-dev.dingtalk.com/
-2. 进入 应用开发 → 企业内部应用 → 创建应用
-3. 添加机器人能力
-4. 记录 AppKey 和 AppSecret
-
-#### 2. 更新配置文件
-
-在 `config.yaml` 中配置机器人信息：
-
-```yaml
-edu:
-  username: "你的学号"
-  password: "你的密码"
-  base_url: "http://jw.glut.edu.cn"
-
-dingtalk:
-  app_key: "你的AppKey"
-  app_secret: "你的AppSecret"
-```
-
-#### 3. 启动服务
+### 启动服务
 
 ```bash
 python3 app.py
