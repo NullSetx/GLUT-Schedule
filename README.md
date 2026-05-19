@@ -159,14 +159,18 @@ cp config.example.yaml config.yaml
 
 ```bash
 # 复制服务文件
-sudo cp GLUT-Schedule.service /etc/systemd/system/
+sudo cp GLUT-Schedule.service GLUT-Schedule-Scheduler.service /etc/systemd/system/
 
 # 重新加载 systemd
 sudo systemctl daemon-reload
 
-# 启动服务
+# 启动交互式机器人服务
 sudo systemctl enable GLUT-Schedule
 sudo systemctl start GLUT-Schedule
+
+# 启动定时推送服务
+sudo systemctl enable GLUT-Schedule-Scheduler
+sudo systemctl start GLUT-Schedule-Scheduler
 ```
 
 ### 服务管理
@@ -174,15 +178,19 @@ sudo systemctl start GLUT-Schedule
 ```bash
 # 查看状态
 sudo systemctl status GLUT-Schedule
+sudo systemctl status GLUT-Schedule-Scheduler
 
 # 重启服务
 sudo systemctl restart GLUT-Schedule
+sudo systemctl restart GLUT-Schedule-Scheduler
 
 # 停止服务
 sudo systemctl stop GLUT-Schedule
+sudo systemctl stop GLUT-Schedule-Scheduler
 
 # 查看日志
 sudo journalctl -u GLUT-Schedule -f
+sudo journalctl -u GLUT-Schedule-Scheduler -f
 ```
 
 ## 依赖

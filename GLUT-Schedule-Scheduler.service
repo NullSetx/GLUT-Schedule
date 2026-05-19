@@ -1,0 +1,14 @@
+[Unit]
+Description=GLUT Schedule DingTalk Scheduler
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/GLUT-Schedule
+ExecStart=/root/GLUT-Schedule/.venv/bin/python scheduler.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
