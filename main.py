@@ -1,12 +1,70 @@
 import argparse
+import json
 import sys
 from datetime import date
 
 import requests
 
 from config import load_config, merge_args_with_config
-from schedule_api import login, query_schedule, format_schedule, format_schedule_markdown
+from schedule_client import login, query_schedule, format_schedule, format_schedule_markdown
 from dingtalk import DingTalkBot, DingTalkError
+
+
+def get_access_token(app_key, app_secret):
+    """通过 DingTalk Open API 获取 access_token"""
+    url = "https://api.dingtalk.com/v1.0/oauth2/accessToken"
+    data = {"appKey": app_key, "appSecret": app_secret}
+    try:
+        resp = requests.post(url, json=data)
+        result = resp.json()
+        if "accessToken" in result:
+            return result["accessToken"]
+        print(f"获取 access_token 失败: {result}")
+        return None
+    except Exception as e:
+        print(f"获取 access_token 异常: {e}")
+        return None
+
+
+def send_via_open_api(dingtalk_config, title, markdown_text):
+    """通过 DingTalk Open API 发送消息到群聊"""
+    app_key = dingtalk_config.get("app_key")
+    app_secret = dingtalk_config.get("app_secret")
+    chat_id = dingtalk_config.get("chat_id")
+
+    if not app_key or not app_secret:
+        print("钉钉配置不完整，缺少 app_key 或 app_secret")
+        return False
+
+    if not chat_id:
+        print("钉钉配置不完整，缺少 chat_id")
+        return False
+
+    access_token = get_access_token(app_key, app_secret)
+    if not access_token:
+        return False
+
+    url = "https://api.dingtalk.com/v1.0/robot/groupMessages/send"
+    headers = {
+        "Content-Type": "application/json",
+        "x-acs-dingtalk-access-token": access_token,
+    }
+    data = {
+        "robotCode": app_key,
+        "openConversationId": chat_id,
+        "msgKey": "sampleMarkdown",
+        "msgParam": json.dumps({"title": title, "text": markdown_text}),
+    }
+    try:
+        resp = requests.post(url, json=data, headers=headers)
+        result = resp.json()
+        if result.get("processQueryKey"):
+            return True
+        print(f"发送失败: {result}")
+        return False
+    except Exception as e:
+        print(f"发送异常: {e}")
+        return False
 
 
 def parse_args():
@@ -54,27 +112,37 @@ def main():
 
     if send:
         dingtalk_config = merged["dingtalk"]
-        access_token = dingtalk_config.get("access_token")
-        secret = dingtalk_config.get("secret")
+        app_key = dingtalk_config.get("app_key")
+        app_secret = dingtalk_config.get("app_secret")
 
-        if not access_token or not secret:
-            print("钉钉配置不完整，请检查配置文件中的 dingtalk.access_token 和 dingtalk.secret")
-            sys.exit(1)
-
-        bot = DingTalkBot(access_token, secret)
-
-        try:
-            if dingtalk_config.get("message_type") == "text":
-                result = bot.send_text(schedule_text)
+        if app_key and app_secret:
+            title = f"{date_str} 课表"
+            markdown_text = format_schedule_markdown(json_data)
+            if send_via_open_api(dingtalk_config, title, markdown_text):
+                print("\n钉钉消息发送成功")
             else:
-                title = f"{date_str} 课表"
-                markdown_text = format_schedule_markdown(json_data)
-                result = bot.send_markdown(title, markdown_text)
+                print("\n钉钉消息发送失败")
+                sys.exit(1)
+        else:
+            access_token = dingtalk_config.get("access_token")
+            secret = dingtalk_config.get("secret")
 
-            print("\n钉钉消息发送成功")
-        except DingTalkError as e:
-            print(f"\n钉钉消息发送失败: {e}")
-            sys.exit(1)
+            if not access_token or not secret:
+                print("钉钉配置不完整，请检查 app_key/app_secret 或 access_token/secret")
+                sys.exit(1)
+
+            bot = DingTalkBot(access_token, secret)
+            try:
+                if dingtalk_config.get("message_type") == "text":
+                    result = bot.send_text(schedule_text)
+                else:
+                    title = f"{date_str} 课表"
+                    markdown_text = format_schedule_markdown(json_data)
+                    result = bot.send_markdown(title, markdown_text)
+                print("\n钉钉消息发送成功")
+            except DingTalkError as e:
+                print(f"\n钉钉消息发送失败: {e}")
+                sys.exit(1)
 
 
 if __name__ == "__main__":

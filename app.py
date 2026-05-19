@@ -9,7 +9,7 @@ from dingtalk_stream.chatbot import ChatbotHandler
 from dingtalk_stream.frames import CallbackMessage
 
 from config import load_config
-from schedule_api import login, query_schedule, format_schedule_markdown
+from schedule_client import login, query_schedule, format_schedule_markdown
 
 config = load_config()
 
@@ -71,8 +71,10 @@ class ScheduleBotHandler(ChatbotHandler):
             incoming_message = dingtalk_stream.ChatbotMessage.from_dict(message.data)
             text_content = incoming_message.text.content.strip() if incoming_message.text else ""
             sender_nick = incoming_message.sender_nick
+            conversation_id = incoming_message.conversation_id
 
             logger.info(f"收到消息: {text_content} from {sender_nick}")
+            logger.info(f"openConversationId: {conversation_id}")
 
             if is_help(text_content):
                 self.reply_text(HELP_TEXT, incoming_message)

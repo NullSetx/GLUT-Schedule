@@ -1,3 +1,4 @@
+import json
 import time
 import logging
 from datetime import date, timedelta
@@ -6,8 +7,7 @@ import schedule
 import requests
 
 from config import load_config
-from schedule_api import login, query_schedule, format_schedule, format_schedule_markdown
-from dingtalk import DingTalkBot
+from schedule_client import login, query_schedule, format_schedule_markdown
 
 logging.basicConfig(
     level=logging.INFO,
@@ -16,6 +16,48 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 config = load_config()
+
+
+def get_access_token(app_key, app_secret):
+    """通过 DingTalk Open API 获取 access_token"""
+    url = "https://api.dingtalk.com/v1.0/oauth2/accessToken"
+    data = {
+        "appKey": app_key,
+        "appSecret": app_secret,
+    }
+    try:
+        resp = requests.post(url, json=data)
+        result = resp.json()
+        if "accessToken" in result:
+            return result["accessToken"]
+        else:
+            logger.error(f"获取 access_token 失败: {result}")
+            return None
+    except Exception as e:
+        logger.error(f"获取 access_token 异常: {e}")
+        return None
+
+
+def send_message_to_group(access_token, robot_code, chat_id, title, markdown_text):
+    """通过 DingTalk Open API 发送 markdown 消息到群聊"""
+    url = "https://api.dingtalk.com/v1.0/robot/groupMessages/send"
+    headers = {
+        "Content-Type": "application/json",
+        "x-acs-dingtalk-access-token": access_token,
+    }
+    data = {
+        "robotCode": robot_code,
+        "openConversationId": chat_id,
+        "msgKey": "sampleMarkdown",
+        "msgParam": json.dumps({"title": title, "text": markdown_text}),
+    }
+    try:
+        resp = requests.post(url, json=data, headers=headers)
+        result = resp.json()
+        return result
+    except Exception as e:
+        logger.error(f"发送消息异常: {e}")
+        return {"processQueryKey": None, "error": str(e)}
 
 
 def push_schedule(push_type="today"):
@@ -45,23 +87,31 @@ def push_schedule(push_type="today"):
             logger.error("课表查询失败")
             return
 
-        schedule_text = format_schedule(json_data)
         markdown_text = format_schedule_markdown(json_data)
 
-        logger.info(f"课表查询成功，准备发送到钉钉")
+        logger.info("课表查询成功，准备发送到钉钉")
 
-        access_token = dingtalk_config.get("access_token")
-        secret = dingtalk_config.get("secret")
+        app_key = dingtalk_config.get("app_key")
+        app_secret = dingtalk_config.get("app_secret")
+        chat_id = dingtalk_config.get("chat_id")
 
-        if not access_token or not secret:
-            logger.error("钉钉配置不完整")
+        if not app_key or not app_secret:
+            logger.error("钉钉配置不完整，缺少 app_key 或 app_secret")
             return
 
-        bot = DingTalkBot(access_token, secret)
-        title = f"{query_date} 课表"
-        result = bot.send_markdown(title, markdown_text)
+        if not chat_id:
+            logger.error("钉钉配置不完整，缺少 chat_id (openConversationId)")
+            logger.info("请在 config.yaml 中添加 chat_id 配置项")
+            return
 
-        if result.get("errcode") == 0:
+        access_token = get_access_token(app_key, app_secret)
+        if not access_token:
+            return
+
+        title = f"{query_date} 课表"
+        result = send_message_to_group(access_token, app_key, chat_id, title, markdown_text)
+
+        if result.get("processQueryKey"):
             logger.info("钉钉消息发送成功")
         else:
             logger.error(f"钉钉消息发送失败: {result}")

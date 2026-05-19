@@ -4,13 +4,14 @@ edu:
   password: "your_password_here"
   base_url: "http://jw.glut.edu.cn"
 
-# 钉钉机器人配置 (Stream 模式需要 app_key 和 app_secret)
+# 钉钉机器人配置
 dingtalk:
+  # Stream 模式 (交互式机器人 + 定时推送)
   app_key: "your_app_key_here"
   app_secret: "your_app_secret_here"
-  # 以下配置用于 Webhook 模式 (定时推送)
-  access_token: "your_access_token_here"
-  secret: "your_secret_here"
+  # 群聊 ID (openConversationId)，定时推送到指定群聊时需要
+  # 获取方式：在钉钉群聊中 @机器人 发送任意消息，查看服务器日志中的 openConversationId
+  chat_id: "your_chat_id_here"
   # 消息类型: "text" 或 "markdown"
   message_type: "markdown"
 
