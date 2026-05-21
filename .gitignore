@@ -1,6 +1,6 @@
 .venv/
 .logs/
-schedule.py
+schedule11.py
 sc_agent.py
 config.yaml
 __pycache__/

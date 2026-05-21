@@ -23,9 +23,11 @@ defaults:
 # 定时推送配置
 schedule:
   enabled: false
-  # 推送时间 (24小时制)
+  # 推送时间 (24小时制)，每条可单独指定 type
   push_times:
-    - "07:30"    # 早上推送当天课表
-    - "21:00"    # 晚上推送明天课表
-  # 推送日期类型: "today" 今天, "tomorrow" 明天
+    - time: "07:30"
+      type: "today"
+    - time: "23:00"
+      type: "tomorrow"
+  # 默认推送日期类型 (可被单条覆盖)
   push_type: "today"

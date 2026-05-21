@@ -129,11 +129,19 @@ def setup_schedule():
         return
 
     push_times = schedule_config.get("push_times", [])
-    push_type = schedule_config.get("push_type", "today")
+    default_push_type = schedule_config.get("push_type", "today")
 
-    for push_time in push_times:
-        schedule.every().day.at(push_time).do(push_schedule, push_type=push_type)
-        logger.info(f"已设置定时任务: 每天 {push_time} 推送{push_type}课表")
+    for item in push_times:
+        if isinstance(item, dict):
+            push_time = item.get("time")
+            push_type = item.get("type", default_push_type)
+        else:
+            push_time = item
+            push_type = default_push_type
+
+        if push_time:
+            schedule.every().day.at(push_time).do(push_schedule, push_type=push_type)
+            logger.info(f"已设置定时任务: 每天 {push_time} 推送{push_type}课表")
 
     if not push_times:
         logger.warning("未设置推送时间")

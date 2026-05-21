@@ -59,8 +59,10 @@ dingtalk:
 schedule:
   enabled: true
   push_times:
-    - "07:30"
-    - "21:00"
+    - time: "07:30"
+      type: "today"
+    - time: "23:00"
+      type: "tomorrow"
   push_type: "today"
 ```
 
